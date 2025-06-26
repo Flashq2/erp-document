@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Website with Update UniqueModal</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .main-content {
+        text-align: center;
+        color: white;
+        z-index: 1;
+      }
+
+      .main-content h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.9;
+      }
+
+      .main-content p {
+        font-size: 1.2rem;
+        opacity: 0.8;
+        margin-bottom: 2rem;
+      }
+
+      .show-UniqueModal-btn {
+        background: #6366f1;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 auto;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .show-UniqueModal-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        background: #5b5fdb;
+      }
+
+      .show-UniqueModal-btn:active {
+        transform: translateY(-1px);
+      }
+
+      .show-UniqueModal-btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s;
+      }
+
+      .show-UniqueModal-btn:hover::before {
+        left: 100%;
+      }
+
+      .btn-icon {
+        font-size: 1.2rem;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      /* UniqueModal Styles */
+      .UniqueModal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0);
+        backdrop-filter: blur(0px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+
+      .UniqueModal-overlay.show {
+        opacity: 1;
+        visibility: visible;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(5px);
+      }
+
+      .UniqueModal {
+        background: white;
+        border-radius: 20px;
+        padding: 0;
+        max-width: 600px;
+        width: 90%;
+        max-height: 80vh;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        transform: scale(0.5) translateY(-50px) rotateX(15deg);
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        opacity: 0;
+      }
+
+      .UniqueModal-overlay.show .UniqueModal {
+        transform: scale(1) translateY(0) rotateX(0deg);
+        opacity: 1;
+      }
+
+      .UniqueModal-overlay.hiding .UniqueModal {
+        transform: scale(0.8) translateY(20px) rotateX(-10deg);
+        opacity: 0;
+      }
+
+      .UniqueModal-header {
+        background: #2c6197 !important;
+        color: white;
+        padding: 25px 30px;
+        text-align: center;
+        position: relative;
+      }
+
+      .UniqueModal-header h2 {
+        font-size: 1.8rem;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .UniqueModal-header .version {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: normal;
+      }
+
+      .close-btn {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background 0.2s ease;
+      }
+
+      .close-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .UniqueModal-content {
+        padding: 30px;
+      }
+
+      .feature-highlight {
+        background: #ec4899;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        text-align: center;
+      }
+
+      .feature-highlight h3 {
+        font-size: 1.3rem;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .search-icon {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+      }
+
+      .gif-container {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 10px;
+        margin: 20px 0;
+        border: 2px dashed #dee2e6;
+        text-align: center;
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+
+      .gif-placeholder {
+        color: #6c757d;
+        font-size: 1rem;
+      }
+
+      .gif-container img {
+        max-width: 100%;
+        max-height: 250px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .description {
+        color: #495057;
+        line-height: 1.6;
+        margin-bottom: 20px;
+      }
+
+      .features-list {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+
+      .features-list h4 {
+        color: #495057;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+      }
+
+      .feature-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        color: #6c757d;
+      }
+
+      .feature-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .check-icon {
+        color: #28a745;
+        margin-right: 10px;
+      }
+
+      .UniqueModal-footer {
+        padding: 20px 30px;
+        background: #f8f9fa;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .btn-primary {
+        background: #6366f1;
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        background: #5b5fdb;
+      }
+
+      .btn-secondary {
+        background: #6c757d;
+        color: white;
+      }
+
+      .btn-secondary:hover {
+        background: #5a6268;
+      }
+
+      .dont-show {
+        font-size: 0.9rem;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .dont-show input[type="checkbox"] {
+        transform: scale(1.1);
+      }
+
+      @media (max-width: 600px) {
+        .UniqueModal {
+          width: 95%;
+          max-height: 90vh;
+        }
+
+        .UniqueModal-header h2 {
+          font-size: 1.5rem;
+        }
+
+        .UniqueModal-content {
+          padding: 20px;
+        }
+
+        .UniqueModal-footer {
+          flex-direction: column;
+          gap: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Main Website Content -->
+    <div class="main-content">
+      <h1>Test Content</h1>
+
+      <!-- Show UniqueModal Button -->
+      <button class="show-UniqueModal-btn" onclick="showUniqueModal()">
+        View What's New
+      </button>
+    </div>
+
+    <!-- Update UniqueModal -->
+    <div class="UniqueModal-overlay" id="updateUniqueModal">
+      <div class="UniqueModal">
+        <div class="UniqueModal-header">
+          <h2>
+            What is New
+            <span class="version">v2.1</span>
+          </h2>
+          <button class="close-btn" onclick="closeUniqueModal()">
+            &times;
+          </button>
+        </div>
+
+        <div class="UniqueModal-content">
+          <!-- <div class="feature-highlight">
+            <h3>
+              <svg class="search-icon" viewBox="0 0 24 24">
+                <path
+                  d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+                />
+              </svg>
+              Enhanced Search Function
+            </h3>
+            <p>Discover content faster than ever!</p>
+          </div> -->
+
+          <div class="gif-container">
+            <!-- Replace this with your actual GIF -->
+            <img src="ezgif.com-video-to-gif-converter (1).gif" alt="" />
+          </div>
+
+          <div class="description">
+            <p>
+              We've completely redesigned our search experience to help you find
+              exactly what you're looking for. Our new intelligent search
+              understands context and delivers more relevant results instantly.
+            </p>
+          </div>
+
+          <div class="features-list">
+            <h4>New Features:</h4>
+            <div class="feature-item">
+              <span class="check-icon">✓</span>
+              <span>Lightning-fast autocomplete suggestions</span>
+            </div>
+            <div class="feature-item">
+              <span class="check-icon">✓</span>
+              <span>Smart filters to narrow down results</span>
+            </div>
+            <div class="feature-item">
+              <span class="check-icon">✓</span>
+              <span>Smart filters to narrow down results</span>
+            </div>
+            <div class="feature-item">
+              <span class="check-icon">✓</span>
+              <span>Smart filters to narrow down results</span>
+            </div>
+            <div class="feature-item">
+              <span class="check-icon">✓</span>
+              <span>Smart filters to narrow down results</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="UniqueModal-footer">
+          <label class="dont-show">
+            <input type="checkbox" id="dontShowAgain" />
+            Don't show this again
+          </label>
+          <div>
+            <button class="btn btn-secondary" onclick="closeUniqueModal()">
+              Maybe Later
+            </button>
+            <button class="btn btn-primary" onclick="trySearch()">
+              Try It Now!
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Show UniqueModal on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        // Check if user has chosen not to see the UniqueModal
+        if (!localStorage.getItem("hideUpdateUniqueModal")) {
+          setTimeout(() => {
+            showUniqueModal();
+          }, 500); // Small delay for better user experience
+        }
+      });
+
+      function showUniqueModal() {
+        const UniqueModal = document.getElementById("updateUniqueModal");
+        UniqueModal.style.display = "flex";
+
+        // Trigger reflow to ensure display change is applied
+        UniqueModal.offsetHeight;
+
+        // Add show class with a small delay for smooth animation
+        setTimeout(() => {
+          UniqueModal.classList.add("show");
+          UniqueModal.classList.remove("hiding");
+        }, 10);
+      }
+
+      function closeUniqueModal() {
+        const UniqueModal = document.getElementById("updateUniqueModal");
+        const dontShowAgain = document.getElementById("dontShowAgain");
+
+        // Add hiding class for exit animation
+        UniqueModal.classList.add("hiding");
+        UniqueModal.classList.remove("show");
+
+        // Hide UniqueModal after animation completes
+        setTimeout(() => {
+          UniqueModal.style.display = "none";
+          UniqueModal.classList.remove("hiding");
+        }, 500);
+
+        // Store preference if checkbox is checked
+        if (dontShowAgain.checked) {
+          localStorage.setItem("hideUpdateUniqueModal", "true");
+        }
+      }
+
+      function trySearch() {
+        // Close UniqueModal first
+        closeUniqueModal();
+
+        // You can add your search functionality here
+        // For example, focus on search input or navigate to search page
+        alert("Taking you to the new search feature!");
+
+        // Example: Focus on search input if it exists
+        // const searchInput = document.querySelector('#search-input');
+        // if (searchInput) searchInput.focus();
+      }
+
+      // Close UniqueModal when clicking outside
+      document
+        .getElementById("updateUniqueModal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            closeUniqueModal();
+          }
+        });
+
+      // Close UniqueModal with Escape key
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          const UniqueModal = document.getElementById("updateUniqueModal");
+          if (UniqueModal.classList.contains("show")) {
+            closeUniqueModal();
+          }
+        }
+      });
+
+      // Add some extra visual flair
+      function addSparkleEffect() {
+        const UniqueModal = document.querySelector(".UniqueModal");
+        const sparkle = document.createElement("div");
+        sparkle.innerHTML = "✨";
+        sparkle.style.position = "absolute";
+        sparkle.style.top = Math.random() * 100 + "%";
+        sparkle.style.left = Math.random() * 100 + "%";
+        sparkle.style.fontSize = "12px";
+        sparkle.style.opacity = "0";
+        sparkle.style.animation = "sparkle 2s ease-out forwards";
+        sparkle.style.pointerEvents = "none";
+        sparkle.style.zIndex = "1001";
+
+        UniqueModal.appendChild(sparkle);
+
+        setTimeout(() => {
+          sparkle.remove();
+        }, 2000);
+      }
+
+      // Add sparkle animation to CSS
+      const sparkleCSS = `
+            @keyframes sparkle {
+                0% {
+                    opacity: 0;
+                    transform: scale(0) rotate(0deg);
+                }
+                50% {
+                    opacity: 1;
+                    transform: scale(1) rotate(180deg);
+                }
+                100% {
+                    opacity: 0;
+                    transform: scale(0) rotate(360deg);
+                }
+            }
+        `;
+
+      const style = document.createElement("style");
+      style.textContent = sparkleCSS;
+      document.head.appendChild(style);
+    </script>
+  </body>
+</html>
